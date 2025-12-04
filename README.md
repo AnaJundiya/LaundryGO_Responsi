@@ -68,14 +68,10 @@ Berisi file pendukung visual:
 **Sumber data berasal dari Google Maps.**
 
 **Printscreen UI Aplikasi LaundryGo**
-![LoginPage](https://github.com/user-attachments/assets/c357d147-d3ce-4cd2-9d66-84c85daf7681)
-![RegisterPage](https://github.com/user-attachments/assets/7715c0ef-a1bb-4adf-b0b7-205259d667a8)
-![Beranda](https://github.com/user-attachments/assets/6217f34b-4d9d-437d-9ac3-1a32277db98c)
-![Filter](https://github.com/user-attachments/assets/e03345d2-01e9-4f40-9bd3-4a44cb4373d3)
-![MapPage](https://github.com/user-attachments/assets/c7248c21-d1de-48c8-b919-b8e5757b0d0d)
-![ListLaundry](https://github.com/user-attachments/assets/48ed3418-03c5-4af2-abe4-20f9bc33a89d)
-![FormEdit](https://github.com/user-attachments/assets/1763d5c8-8ac6-440b-b4c6-55f6ddf05d7c)
-![FormInput](https://github.com/user-attachments/assets/b9cea882-1ab5-4d1c-a1d0-09c0d0259f88)
+
+![LoginPage](https://github.com/user-attachments/assets/c357d147-d3ce-4cd2-9d66-84c85daf7681) ![RegisterPage](https://github.com/user-attachments/assets/7715c0ef-a1bb-4adf-b0b7-205259d667a8) ![Beranda](https://github.com/user-attachments/assets/6217f34b-4d9d-437d-9ac3-1a32277db98c)
+![Filter](https://github.com/user-attachments/assets/e03345d2-01e9-4f40-9bd3-4a44cb4373d3) ![MapPage](https://github.com/user-attachments/assets/c7248c21-d1de-48c8-b919-b8e5757b0d0d) ![ListLaundry](https://github.com/user-attachments/assets/48ed3418-03c5-4af2-abe4-20f9bc33a89d)
+![FormEdit](https://github.com/user-attachments/assets/1763d5c8-8ac6-440b-b4c6-55f6ddf05d7c) ![FormInput](https://github.com/user-attachments/assets/b9cea882-1ab5-4d1c-a1d0-09c0d0259f88)
 
 
 
