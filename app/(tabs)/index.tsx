@@ -1,98 +1,126 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet, View, ScrollView } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      {/* Logo LaundryGo */}
+      <Image
+        source={require("E:/PGPBL_ANDROID/reactnative/assets/images/logo1.png")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
+      {/* Judul */}
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title" style={styles.title}>
+          Selamat Datang di LaundryGo!
         </ThemedText>
       </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+
+      {/* Informasi Aplikasi */}
+      <ThemedView style={styles.infoContainer}>
+        <ThemedText style={styles.infoText}>
+          LaundryGo adalah aplikasi mobile berbasis lokasi yang menampilkan daftar toko laundry terdekat lengkap dengan informasi harga layanan, fasilitas, dan ulasan. Aplikasi ini dilengkapi fitur visualisasi peta persebaran laundry, filter pencarian (harga & jarak), serta halaman list toko laundry.
         </ThemedText>
       </ThemedView>
-    </ParallaxScrollView>
+
+      {/* Fitur LaundryGo */}
+      <ThemedView style={styles.featuresContainer}>
+        <ThemedText style={styles.featuresTitle}>Fitur Utama LaundryGo</ThemedText>
+
+        <View style={[styles.featureBox, { backgroundColor: '#aacc3f' }]}>
+          <ThemedText style={styles.featureText}>📍 Peta persebaran laundry terdekat</ThemedText>
+        </View>
+
+        <View style={[styles.featureBox, { backgroundColor: '#2596be' }]}>
+          <ThemedText style={styles.featureText}>💰 Filter harga layanan</ThemedText>
+        </View>
+
+        <View style={[styles.featureBox, { backgroundColor: '#aacc3f' }]}>
+          <ThemedText style={styles.featureText}>📏 Filter jarak toko laundry</ThemedText>
+        </View>
+
+        <View style={[styles.featureBox, { backgroundColor: '#2596be' }]}>
+          <ThemedText style={styles.featureText}>🧺 Halaman list toko laundry</ThemedText>
+        </View>
+
+        {/* Nama pembuat */}
+        <ThemedText style={styles.creatorText}>
+          Dibuat oleh: Ana Jundiya Muthia Hamzah
+        </ThemedText>
+      </ThemedView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff', // background putih bersih
+    paddingHorizontal: 20,
+  },
+  logo: {
+    width: 200, // logo diperbesar
+    height: 200,
+    alignSelf: 'center',
+    marginTop: 50, // jarak top diperbesar
+    marginBottom: 20,
+  },
   titleContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 24,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    color: '#2596be',
+    textAlign: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  infoContainer: {
+    marginBottom: 24,
+  },
+  infoText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    textAlign: 'justify',
+    lineHeight: 24,
+  },
+  featuresContainer: {
+    marginBottom: 40,
+  },
+  featuresTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#aacc3f',
+    marginBottom: 12,
+  },
+  featureBox: {
+    padding: 16,
+    borderRadius: 14,
+    marginBottom: 12,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+  },
+  featureText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  creatorText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#555',
+    marginTop: 20,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
