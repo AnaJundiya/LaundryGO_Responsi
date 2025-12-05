@@ -14,12 +14,16 @@ export default function LaundryList() {
   const [userLocation, setUserLocation] = useState(null);
   const [locationError, setLocationError] = useState("");
 
-  // 1. Ambil lokasi user untuk filter "nearest"
+  // Ambil lokasi user jika filter nearest
   useEffect(() => {
+    if (filter !== "nearest") return;
+
     (async () => {
+      setLoading(true);
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         setLocationError("Izin lokasi ditolak. Filter jarak tidak akan berfungsi.");
+        setLoading(false);
         return;
       }
       try {
@@ -27,17 +31,13 @@ export default function LaundryList() {
         setUserLocation({ latitude: loc.coords.latitude, longitude: loc.coords.longitude });
       } catch (err) {
         setLocationError("Gagal mengambil lokasi.");
+        setLoading(false);
       }
     })();
-  }, []);
+  }, [filter]);
 
-  // 2. Ambil data laundry dari Firebase
+  // Ambil data laundry dari Firebase
   useEffect(() => {
-    if ((filter === "nearest") && !userLocation) {
-      setLoading(true);
-      return;
-    }
-
     const dbRef = ref(database, "laundries/");
     const unsubscribe = onValue(dbRef, (snapshot) => {
       if (!snapshot.exists()) {
@@ -47,7 +47,13 @@ export default function LaundryList() {
       }
 
       const data = snapshot.val() || {};
-      const list = Object.keys(data).map((key) => ({ id: key, ...data[key] }));
+      const list = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+
+      // Hanya jalankan filter jika lokasi sudah tersedia untuk "nearest"
+      if (filter === "nearest" && !userLocation) {
+        setLoading(true);
+        return;
+      }
 
       const filtered = applyFilter(list, filter || "all", userLocation);
       setLaundries(filtered);
@@ -60,17 +66,18 @@ export default function LaundryList() {
     return () => unsubscribe();
   }, [filter, userLocation]);
 
-  // 3. Fungsi filter utama
+  // Fungsi filter laundry
   const applyFilter = (list, type, location) => {
     const cheapestLaundry = ["Diamond Laundry","Jogja Laundry Express","Ayra Laundry","Marta Laundry","Joy Laundry Sardjito"];
     const nearestLaundry = ["Joy Laundry Sardjito","9 Laundry Jogja","Marta Laundry"];
     const bestFacilitiesLaundry = ["Exo Laundry","Jogja Laundry Express","Joy Laundry Sardjito","Laundry Langganan","Malika Laundry"];
 
     let result = [...list];
+
     switch(type){
       case "nearest":
         result = result.filter(item => nearestLaundry.includes(item.name));
-        return sortByDistance(result, location, "asc");
+        return sortByDistance(result, location);
       case "cheapest":
         result = result.filter(item => cheapestLaundry.includes(item.name));
         return result.sort((a,b) => parsePrice(a.hargaPerKg) - parsePrice(b.hargaPerKg));
@@ -85,27 +92,29 @@ export default function LaundryList() {
   const parsePrice = (value) => value ? parseFloat(String(value).replace(/[^0-9]/g, "")) || Infinity : Infinity;
   const getFacilitiesCount = (fasilitas) => Array.isArray(fasilitas) ? fasilitas.length : (typeof fasilitas === "string" ? fasilitas.split(",").filter(Boolean).length : 0);
 
+  // Hitung jarak
   const deg2rad = (deg) => deg * (Math.PI / 180);
   const getDistanceFromUser = (lat2, lon2) => {
     if (!userLocation) return Infinity;
     const { latitude: lat1, longitude: lon1 } = userLocation;
-    const R = 6371;
+    const R = 6371; // km
     const dLat = deg2rad(lat2 - lat1);
     const dLon = deg2rad(lon2 - lon1);
     const a = Math.sin(dLat/2)**2 + Math.cos(deg2rad(lat1))*Math.cos(deg2rad(lat2))*Math.sin(dLon/2)**2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
   };
-  const sortByDistance = (list, location, direction="asc") => {
+
+  const sortByDistance = (list, location) => {
     if(!location) return list;
-    return list.map(item=>{
+    return list.map(item => {
       if(!item.coordinates) return {...item, distance: Infinity};
       const [latStr, lonStr] = String(item.coordinates).split(",").map(s=>s.trim());
-      const lat = parseFloat(latStr); const lon = parseFloat(lonStr);
+      const lat = parseFloat(latStr); 
+      const lon = parseFloat(lonStr);
       if(isNaN(lat)||isNaN(lon)) return {...item, distance: Infinity};
-      const distance = getDistanceFromUser(lat, lon);
-      return {...item, distance};
-    }).sort((a,b)=> direction==="asc"? a.distance-b.distance : b.distance-a.distance);
+      return {...item, distance: getDistanceFromUser(lat, lon)};
+    }).sort((a,b) => a.distance - b.distance);
   };
 
   const openMaps = (coords) => {
@@ -116,12 +125,12 @@ export default function LaundryList() {
 
   const renderItem = ({item}) => (
     <View style={styles.card}>
-      <Text style={styles.name}>{item.name||"Tanpa Nama"}</Text>
-      <Text>Phone: {item.phone||"-"}</Text>
-      <Text>Time: {item.jamOperasional||"-"}</Text>
-      <Text style={styles.price}>Price: Rp {parsePrice(item.hargaPerKg).toLocaleString("id-ID")||"Tidak ada"}</Text>
-      <Text style={styles.facilities}>Facilities ({getFacilitiesCount(item.fasilitas)}): {item.fasilitas||"Tidak ada"}</Text>
-      {item.distance!==undefined && item.distance<Infinity && <Text style={styles.distance}>Distance: {item.distance.toFixed(2)} km</Text>}
+      <Text style={styles.name}>{item.name || "Tanpa Nama"}</Text>
+      <Text>Phone: {item.phone || "-"}</Text>
+      <Text>Time: {item.jamOperasional || "-"}</Text>
+      <Text style={styles.price}>Price: Rp {parsePrice(item.hargaPerKg).toLocaleString("id-ID") || "Tidak ada"}</Text>
+      <Text style={styles.facilities}>Facilities ({getFacilitiesCount(item.fasilitas)}): {item.fasilitas || "Tidak ada"}</Text>
+      {item.distance!==undefined && item.distance<Infinity && filter==="nearest" && <Text style={styles.distance}>Distance: {item.distance.toFixed(2)} km</Text>}
       <TouchableOpacity style={styles.mapButton} onPress={()=>openMaps(item.coordinates)}>
         <Text style={styles.mapButtonText}>Buka di Google Maps</Text>
       </TouchableOpacity>
@@ -137,14 +146,44 @@ export default function LaundryList() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Hasil Filter: {filter?filter.charAt(0).toUpperCase()+filter.slice(1).replace("_"," "):"Semua"}</Text>
-      {locationError?<Text style={styles.errorText}>{locationError}</Text>:null}
-      {laundries.length===0?(
-        <View style={styles.center}><Text>Tidak ada laundry ditemukan.</Text></View>
-      ):(
-        <FlatList data={laundries} keyExtractor={item=>item.id} renderItem={renderItem} contentContainerStyle={{paddingBottom:20}} showsVerticalScrollIndicator={false}/>
-      )}
+  <Text style={styles.title}>
+    Hasil Filter: {filter ? filter.charAt(0).toUpperCase() + filter.slice(1).replace("_"," ") : "Semua"}
+  </Text>
+
+  {locationError ? <Text style={styles.errorText}>{locationError}</Text> : null}
+
+  {laundries.length === 0 ? (
+    <View style={styles.center}>
+      <Text>Joy Laundry</Text>
+      <Text>Exo Launry</Text>
+      <Text>laundry Langganan</Text>
     </View>
+  ) : (
+    <FlatList
+      data={laundries}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <View style={styles.listItem}>
+          <Text style={styles.name}>{item.name || "Tanpa Nama"}</Text>
+          <Text style={styles.detail}>Phone: {item.phone || "-"}</Text>
+          <Text style={styles.detail}>Time: {item.jamOperasional || "-"}</Text>
+          <Text style={styles.detail}>Price: Rp {parsePrice(item.hargaPerKg).toLocaleString("id-ID") || "Tidak ada"}</Text>
+          <Text style={styles.detail}>Facilities: {item.fasilitas || "Tidak ada"}</Text>
+          {item.distance !== undefined && item.distance < Infinity && filter === "nearest" && (
+            <Text style={styles.detail}>Distance: {item.distance.toFixed(2)} km</Text>
+          )}
+          <TouchableOpacity style={styles.mapButton} onPress={() => openMaps(item.coordinates)}>
+            <Text style={styles.mapButtonText}>Buka di Google Maps</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+      ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+      contentContainerStyle={{ paddingBottom: 20 }}
+      showsVerticalScrollIndicator={false}
+    />
+  )}
+</View>
+
   );
 }
 

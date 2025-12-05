@@ -15,13 +15,13 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { db } from "../constants/firebase";
 
 const COLORS = {
-  background: "#FDFAF6",
-  brickRed: "#E76F51",
-  orange: "#F4A261",
-  darkText: "#264653",
+  background: "#f0f9f5",      // soft green background (#aacc3f tone light)
+  primary: "#2596be",          // blue tone
+  secondary: "#aacc3f",        // green tone
+  darkText: "#264653",         // dark text
   lightText: "#FFFFFF",
-  placeholder: "#A9A9A9",
-  borderColor: "#E0E0E0",
+  placeholder: "#6c757d",      // slightly darker gray
+  borderColor: "#c0d6a3",      // light green border
 };
 
 const App = () => {
@@ -39,17 +39,12 @@ const App = () => {
     jamOperasional: initialJamOperasional,
   } = params;
 
-  // Extract nomor dari "tel:628xxxx"
-  const extractPhone = (phone) => {
-    if (!phone) return "";
-    return phone.replace("tel:", "");
-  };
+  const extractPhone = (phone) => (phone ? phone.replace("tel:", "") : "");
 
   const [name, setName] = useState(initialName || "");
   const [location, setLocation] = useState(initialCoordinates || "");
   const [accuration, setAccuration] = useState(initialAccuration || "");
   const [phone, setPhone] = useState(extractPhone(initialPhone));
-
   const [hargaPerKg, setHargaPerKg] = useState(initialHargaPerKg || "");
   const [fasilitas, setFasilitas] = useState(initialFasilitas || "");
   const [jamOperasional, setJamOperasional] = useState(initialJamOperasional || "");
@@ -61,14 +56,10 @@ const App = () => {
       Alert.alert("Permission Denied", "Lokasi tidak diizinkan.");
       return;
     }
-
     try {
       let loc = await Location.getCurrentPositionAsync({});
-      const coords = `${loc.coords.latitude},${loc.coords.longitude}`;
-      setLocation(coords);
-
-      const accuracy = loc.coords.accuracy;
-      setAccuration(accuracy ? `${accuracy.toFixed(2)} m` : "N/A");
+      setLocation(`${loc.coords.latitude},${loc.coords.longitude}`);
+      setAccuration(loc.coords.accuracy ? `${loc.coords.accuracy.toFixed(2)} m` : "N/A");
     } catch (error) {
       Alert.alert("Error", "Tidak bisa mengambil lokasi.");
       console.error(error);
@@ -78,24 +69,13 @@ const App = () => {
   // SAVE
   const handleSave = () => {
     const idString = Array.isArray(id) ? id[0] : id;
-
     if (!idString || !name || !location) {
       Alert.alert("Incomplete Form", "Mohon lengkapi semua field.");
       return;
     }
-
     const phoneLink = `tel:${phone}`;
-
-    const locationRef = ref(database, `points/${idString}`);
-    update(locationRef, {
-      name,
-      coordinates: location,
-      accuration,
-      phone: phoneLink,
-      hargaPerKg,
-      fasilitas,
-      jamOperasional,
-    })
+    const locationRef = ref(db, `points/${idString}`);
+    update(locationRef, { name, coordinates: location, accuration, phone: phoneLink, hargaPerKg, fasilitas, jamOperasional })
       .then(() => {
         Alert.alert("Success", "Data berhasil diperbarui!");
         router.back();
@@ -110,10 +90,8 @@ const App = () => {
     <SafeAreaProvider style={{ flex: 1, backgroundColor: COLORS.background }}>
       <SafeAreaView style={styles.container}>
         <Stack.Screen options={{ title: "Form Edit Location" }} />
-
         <ScrollView contentContainerStyle={styles.formContainer}>
 
-          {/* Nama */}
           <Text style={styles.inputTitle}>Nama Laundry</Text>
           <TextInput
             style={styles.input}
@@ -123,7 +101,6 @@ const App = () => {
             onChangeText={setName}
           />
 
-          {/* Telepon */}
           <Text style={styles.inputTitle}>Telepon (628xxxxxxx)</Text>
           <TextInput
             style={styles.input}
@@ -134,7 +111,6 @@ const App = () => {
             onChangeText={setPhone}
           />
 
-          {/* Harga */}
           <Text style={styles.inputTitle}>Harga per KG</Text>
           <TextInput
             style={styles.input}
@@ -145,7 +121,6 @@ const App = () => {
             onChangeText={setHargaPerKg}
           />
 
-          {/* Fasilitas */}
           <Text style={styles.inputTitle}>Fasilitas</Text>
           <TextInput
             style={styles.input}
@@ -155,7 +130,6 @@ const App = () => {
             onChangeText={setFasilitas}
           />
 
-          {/* Jam Operasional */}
           <Text style={styles.inputTitle}>Jam Operasional</Text>
           <TextInput
             style={styles.input}
@@ -165,7 +139,6 @@ const App = () => {
             onChangeText={setJamOperasional}
           />
 
-          {/* Koordinat */}
           <Text style={styles.inputTitle}>Koordinat</Text>
           <TextInput
             style={styles.input}
@@ -175,7 +148,6 @@ const App = () => {
             onChangeText={setLocation}
           />
 
-          {/* Akurasi */}
           <Text style={styles.inputTitle}>Akurasi</Text>
           <TextInput
             style={styles.input}
@@ -185,24 +157,20 @@ const App = () => {
             editable={false}
           />
 
-          {/* Button Get Location */}
           <Pressable
             style={({ pressed }) => [
               styles.button,
-              styles.primaryButton,
-              { opacity: pressed ? 0.8 : 1 },
+              { backgroundColor: COLORS.primary, opacity: pressed ? 0.8 : 1 },
             ]}
             onPress={getCoordinates}
           >
             <Text style={styles.buttonText}>Get Current Location</Text>
           </Pressable>
 
-          {/* Save */}
           <Pressable
             style={({ pressed }) => [
               styles.button,
-              styles.secondaryButton,
-              { opacity: pressed ? 0.8 : 1 },
+              { backgroundColor: COLORS.secondary, opacity: pressed ? 0.8 : 1 },
             ]}
             onPress={handleSave}
           >
@@ -216,51 +184,12 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  formContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 40,
-  },
-  inputTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: COLORS.darkText,
-    marginBottom: 8,
-    marginLeft: 2,
-  },
-  input: {
-    backgroundColor: "#FFFFFF",
-    height: 50,
-    paddingHorizontal: 15,
-    borderWidth: 1,
-    borderColor: COLORS.borderColor,
-    borderRadius: 12,
-    fontSize: 16,
-    color: COLORS.darkText,
-    marginBottom: 20,
-  },
-  button: {
-    height: 50,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 10,
-  },
-  primaryButton: {
-    backgroundColor: COLORS.orange,
-  },
-  secondaryButton: {
-    backgroundColor: COLORS.brickRed,
-  },
-  buttonText: {
-    color: COLORS.lightText,
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  container: { flex: 1, backgroundColor: COLORS.background },
+  formContainer: { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 40 },
+  inputTitle: { fontSize: 16, fontWeight: "600", color: COLORS.darkText, marginBottom: 8, marginLeft: 2 },
+  input: { backgroundColor: "#fff", height: 50, paddingHorizontal: 15, borderWidth: 1, borderColor: COLORS.borderColor, borderRadius: 12, fontSize: 16, color: COLORS.darkText, marginBottom: 20 },
+  button: { height: 50, borderRadius: 12, justifyContent: "center", alignItems: "center", marginTop: 10 },
+  buttonText: { color: COLORS.lightText, fontSize: 16, fontWeight: "bold" },
 });
 
 export default App;

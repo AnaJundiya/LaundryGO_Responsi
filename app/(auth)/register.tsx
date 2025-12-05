@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  Alert, KeyboardAvoidingView, Platform, Image
+  Alert, KeyboardAvoidingView, Platform, Image, ScrollView
 } from "react-native";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../../constants/firebase";
@@ -26,11 +26,6 @@ export default function RegisterScreen() {
     setLoading(true);
 
     try {
-      console.log("Mencoba daftar:", email);
-
-      if (!auth) throw new Error("Firebase Auth belum diinisialisasi.");
-      if (!db) throw new Error("Firebase Firestore belum diinisialisasi.");
-
       const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
       const user = userCredential.user;
 
@@ -44,9 +39,6 @@ export default function RegisterScreen() {
       router.replace("/");
 
     } catch (error: any) {
-      console.log("Firebase Error Code:", error.code);
-      console.log("Firebase Error Message:", error.message);
-
       let errorMessage = "Terjadi kesalahan saat mendaftar.";
       switch (error.code) {
         case "auth/configuration-not-found":
@@ -74,49 +66,53 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1 }}
+      style={{ flex: 1, backgroundColor: "#fff" }}
     >
-      <View style={styles.container}>
-        {/* Logo */}
-        <Image
-          source={require("E:/PGPBL_ANDROID/reactnative/assets/images/logo1.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.container}>
+          {/* Logo */}
+          <Image
+            source={require("E:/PGPBL_ANDROID/reactnative/assets/images/logo1.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
 
-        <Text style={styles.title}>Daftar Akun Baru</Text>
+          <Text style={styles.title}>Daftar Akun Baru</Text>
 
-        <TextInput
-          placeholder="Email"
-          style={styles.input}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
+          <View style={styles.form}>
+            <TextInput
+              placeholder="Email"
+              style={styles.input}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
 
-        <TextInput
-          placeholder="Password (min. 6 karakter)"
-          secureTextEntry
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-        />
+            <TextInput
+              placeholder="Password (min. 6 karakter)"
+              secureTextEntry
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+            />
 
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={onRegister}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? "Mendaftarkan..." : "Buat Akun"}
-          </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, loading && styles.buttonDisabled]}
+              onPress={onRegister}
+              disabled={loading}
+            >
+              <Text style={styles.buttonText}>
+                {loading ? "Mendaftarkan..." : "Buat Akun"}
+              </Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.link}>Sudah punya akun? Masuk di sini</Text>
-        </TouchableOpacity>
-      </View>
+            <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+              <Text style={styles.link}>Sudah punya akun? Masuk di sini</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -132,28 +128,31 @@ const styles = StyleSheet.create({
   logo: {
     width: 120,
     height: 120,
-    marginBottom: 30,
+    marginBottom: 20,
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 40,
+    marginBottom: 24,
     textAlign: "center",
-    color: "#2596be", // Warna biru
+    color: "#2596be",
+  },
+  form: {
+    width: "100%",
   },
   input: {
     width: "100%",
     borderWidth: 1,
     borderColor: "#ddd",
-    padding: 16,
+    padding: 14,
     borderRadius: 12,
-    marginBottom: 14,
+    marginBottom: 12,
     backgroundColor: "#f9f9f9",
   },
   button: {
     width: "100%",
-    backgroundColor: "#aacc3f", // Warna hijau
-    padding: 16,
+    backgroundColor: "#aacc3f",
+    padding: 14,
     borderRadius: 12,
     marginTop: 8,
   },
@@ -168,8 +167,8 @@ const styles = StyleSheet.create({
   },
   link: {
     textAlign: "center",
-    marginTop: 24,
-    color: "#2596be", // Warna link biru
+    marginTop: 16,
+    color: "#2596be",
     fontSize: 16,
     fontWeight: "600",
   },

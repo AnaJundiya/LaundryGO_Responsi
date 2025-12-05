@@ -3,17 +3,23 @@ import { StyleSheet, TextInput, Text, TouchableOpacity, View } from "react-nativ
 import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
 
+const COLORS = {
+  background: "#f0f9f5", // soft green background
+  primary: "#2596be",     // blue
+  secondary: "#aacc3f",   // green
+  darkText: "#264653",    // dark text
+  lightText: "#ffffff",
+  placeholder: "#6c757d",
+  borderColor: "#c0d6a3", // light green border
+};
+
 const TextInputExample = () => {
   const [nama, setNama] = React.useState("");
   const [nim, setNim] = React.useState("");
   const [kelas, setKelas] = React.useState("");
-
-  // Field Nomor Telepon
   const [phoneNumber, setPhoneNumber] = React.useState("");
-
   const [coordinates, setCoordinates] = React.useState("");
 
-  // Validasi: hanya angka
   const handlePhoneInput = (text) => {
     const numeric = text.replace(/[^0-9]/g, "");
     setPhoneNumber(numeric);
@@ -31,7 +37,7 @@ const TextInputExample = () => {
         <TextInput
           style={styles.input}
           placeholder="Isikan Nama"
-          placeholderTextColor="#b5b5b5"
+          placeholderTextColor={COLORS.placeholder}
           value={nama}
           onChangeText={setNama}
         />
@@ -41,7 +47,7 @@ const TextInputExample = () => {
         <TextInput
           style={styles.input}
           placeholder="Nomor Induk Mahasiswa"
-          placeholderTextColor="#b5b5b5"
+          placeholderTextColor={COLORS.placeholder}
           keyboardType="numeric"
           value={nim}
           onChangeText={setNim}
@@ -52,7 +58,7 @@ const TextInputExample = () => {
         <TextInput
           style={styles.input}
           placeholder="Isikan Kelas"
-          placeholderTextColor="#b5b5b5"
+          placeholderTextColor={COLORS.placeholder}
           value={kelas}
           onChangeText={setKelas}
         />
@@ -62,7 +68,7 @@ const TextInputExample = () => {
         <TextInput
           style={styles.input}
           placeholder="628123456789"
-          placeholderTextColor="#b5b5b5"
+          placeholderTextColor={COLORS.placeholder}
           keyboardType="numeric"
           value={phoneNumber}
           onChangeText={handlePhoneInput}
@@ -73,13 +79,13 @@ const TextInputExample = () => {
         <TextInput
           style={styles.input}
           placeholder="-7.7,110.36"
-          placeholderTextColor="#b5b5b5"
+          placeholderTextColor={COLORS.placeholder}
           value={coordinates}
           onChangeText={setCoordinates}
         />
 
         {/* Tombol Simpan */}
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: COLORS.primary }]}>
           <Text style={styles.buttonText}>Simpan</Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -90,13 +96,13 @@ const TextInputExample = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF4E6",
+    backgroundColor: COLORS.background,
     padding: 20,
   },
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#B63E1E",
+    color: COLORS.darkText,
     textAlign: "center",
     marginBottom: 24,
     marginTop: 10,
@@ -107,38 +113,37 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontSize: 16,
     fontWeight: "600",
-    color: "#FF6B35",
+    color: COLORS.secondary, // hijau (#aacc3f)
   },
   input: {
     height: 45,
     marginVertical: 8,
     borderWidth: 1.5,
-    borderColor: "#F4A261",
+    borderColor: COLORS.borderColor,
     borderRadius: 10,
     paddingHorizontal: 12,
     backgroundColor: "#fff",
-    color: "#333",
+    color: COLORS.darkText,
     fontSize: 16,
-    shadowColor: "#FF6B35",
+    shadowColor: COLORS.secondary,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.15,
     shadowRadius: 2,
     elevation: 2,
   },
   button: {
-    backgroundColor: "#FF6B35",
     paddingVertical: 14,
     borderRadius: 10,
     marginTop: 28,
     alignItems: "center",
-    shadowColor: "#B63E1E",
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 3,
   },
   buttonText: {
-    color: "#fff",
+    color: COLORS.lightText,
     fontSize: 18,
     fontWeight: "bold",
     letterSpacing: 0.5,
